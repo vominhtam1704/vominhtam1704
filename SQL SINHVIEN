@@ -1,0 +1,110 @@
+CREATE TABLE LOP(
+MaLop CHAR(7) PRIMARY KEY ,
+TenLop NVARCHAR(50) ,
+SiSo tinyint CHECK (SiSo > 0)
+)
+
+CREATE TABLE MONHOC(
+MaMH CHAR(6) PRIMARY KEY,
+TenMH NVARCHAR(50),
+TCLT TINYINT CHECK ( TCLT > 0),
+TCTH TINYINT CHECK ( TCTH >= 0)
+)
+
+CREATE TABLE SINHVIEN(
+MSSV CHAR(6) PRIMARY KEY,
+HoTen NVARCHAR(50),
+NTNS DATE,
+Phai bit CHECK (Phai in (1,0)),
+MaLop CHAR(7),
+FOREIGN KEY (MaLop) REFERENCES LOP(MaLop)
+)
+
+CREATE TABLE DIEMSV(
+MSSV CHAR(6),
+MaMH CHAR(6),
+Diem DECIMAL(3,1) CHECK( Diem >= 0 and Diem <= 10),
+FOREIGN KEY (MSSV) REFERENCES SINHVIEN(MSSV),
+FOREIGN KEY (MaMH) REFERENCES MONHOC(MaMH)
+)
+
+INSERT INTO LOP (MaLop, TenLop, SiSo) VALUES
+	('18DTH01', N'CNTT Khóa 18, Lớp 1', 50),
+	('18DTH02', N'CNTT Khóa 18, Lớp 2', 45),
+	('19DTH01', N'CNTT Khóa 19, Lớp 1', 55),
+	('19DTH02', N'CNTT Khóa 19, Lớp 2', 50),
+	('19DTH03', N'CNTT Khóa 19, Lớp 3', 40);
+ 
+INSERT INTO MONHOC (MaMH, TenMH, TCLT, TCTH) VALUES
+	('COS201', N'Kỹ thuật lập trình', 2, 1),
+	('COS202', N'Lý thuyết đồ thị', 2, 1),
+	('COS203', N'CSDLvà quản trị CSDL', 3, 0),
+	('COS204', N'Phân tích thiết kế hệ thống', 3, 0),
+	('COS205', N'CSDL phân tán', 3, 0);
+  
+SET DATEFORMAT DMY
+
+INSERT INTO SINHVIEN (MSSV, HoTen, NTNS, Phai, MaLop) VALUES
+	(170001, N'Lê Hoài An', '1999-10-12', 1, '18DTH01'),
+	(180002, N'Nguyễn Thị Hòa Bình', '2000-11-20', 1, '18DTH01'), 
+	(180003, N'Phạm Tường Châu', '2000-06-07', 0, '18DTH02'),
+	(180004, N'Trần Công Danh', '2000-01-31', 0, '19DTH01');
+  
+INSERT INTO DIEMSV (MSSV, MaMH, Diem) VALUES
+	(170001, 'COS201', 10),
+	(170001, 'COS202', 10),
+	(170001, 'COS203', 10),
+	(170001, 'COS204', 10),
+	(170001, 'COS205', 10),
+	(180002, 'COS201', 3.5),
+	(180002, 'COS202', 7),
+	(180003, 'COS201', 8.5),
+	(180003, 'COS202', 2),
+	(180003, 'COS203', 6.5),
+	(180004, 'COS201', 8 ),
+	(180004, 'COS204', NULL);
+
+-- câu 1
+INSERT INTO SINHVIEN(MSSV, HoTen, NTNS, Phai,MaLop) VALUES
+(190001,N'Đào Thị Tuyết Hoa','2001-03-08',0,'19DTH02');
+
+SELECT * FROM SINHVIEN
+
+-- câu 2 đổi tên 'Lý thuyết đồ thị" thành 'Toán rời rạc'
+UPDATE MONHOC
+SET TenMH = N'Toán rời rạc'
+Where MaMH = 'COS202'
+SELECT * FROM MONHOC
+
+
+-- câu 3 xuất tên những môn học không có thực hành 
+SELECT TenMH 
+FROM MONHOC
+WHERE TCTH = 0
+
+-- câu 4 hiển thị các môn học vừa có lý thuyết vừa có thực hành
+SELECT TenMH
+FROM MONHOC
+WHERE TCLT > 0 AND TCTH > 0
+
+
+-- câu 5 in ra các môn học có ký tự đầu tiên bằng chữ C
+SELECT TenMH AS [MH bắt đầu bằng chữ C]
+FROM MONHOC
+WHERE TenMH LIKE N'C%'
+
+
+-- câu 6 liệt kê thông tin những sinh viên có chữ Thị
+SELECT HoTen AS [SV có họ là "Thị"]
+FROM SINHVIEN
+WHERE HoTen LIKE N'%Thị%'
+
+-- câu 7
+SELECT top 2 MaLop, TenLop, SiSo
+FROM LOP
+ORDER BY SiSo DESC
+
+-- câu 8
+SELECT sv.MSSV, sv.HoTen, sv.NTNS, sv.Phai
+FROM SINHVIEN sv join LOP l on sv.MaLop = l.MaLop
+ORDER BY l.MaLop ASC
